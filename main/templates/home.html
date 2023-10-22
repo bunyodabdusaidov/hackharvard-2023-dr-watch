@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+</head>
+<body>
+    <main class="container">
+        <form class="my-4" action="/">
+            <div class="input-group mb-3">
+                <input type="text" name="q" class="form-control form-control-lg" placeholder="Search" />
+                <button class="btn btn-dark btn-lg" type="submit" id="button-addon2">Search</button>
+            </div>
+        </form>
+        <h3 class="my-3">Patient List <a href="/add-patient" class="float-end btn btn-sm btn-success mt-2">Add Patient</a></h3>
+        {% for msg in messages %}
+        <p class="text-success">{{msg}}</p>
+        {% endfor %}
+        <table class="table table-bordered">
+            <tr>
+                <th>#</th>
+                <th>Visit Date</th>
+                <th>Next V. Date</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Mobile No</th>
+                <th>Detail</th>
+                <th>Precautions</th>
+                <th>Action</th>
+            </tr>
+            {% if data %}
+                {% for patient in data %}
+                <tr>
+                    <td>{{patient.id}}</td>
+                    <td>{{patient.visit_date}}</td>
+                    <td>{{patient.next_visit_date}}</td>
+                    <td>{{patient.full_name}}</td>
+                    <td>{{patient.email}}</td>
+                    <td>{{patient.mobile_no}}</td>
+                    <td>{{patient.detail}}</td>
+                    <td>{{patient.precout}}</td>
+                    <td>
+                        <a href="/update-patient/{{patient.id}}" class="btn btn-info btm-sm">Modify</a>
+                        <a onclick="return confirm('Are you sure you want to delete this data?')" href="/delete-patient/{{patient.id}}" class="btn btn-danger btm-sm">Delete</a>
+                        <form method="post" action="/send-email/{{patient.id}}">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-primary mt-2" value="Remind" />
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endif %}
+        </table>
+        <!-- Pagination -->
+        <nav aria-label="...">
+            <ul class="pagination">
+                {% if data.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{data.previous_page_number}}" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+                {% endif %}
+                {% for i in data.paginator.page_range %}
+                    {% if data.number == i %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="#">{{i}}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if data.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{data.next_page_number}}" tabindex="-1" aria-disabled="true">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </main>
+</body>
+</html>
